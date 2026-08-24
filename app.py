@@ -5,7 +5,7 @@ from groq import Groq
 
 st.set_page_config(page_title="IIFL Gold Loan Compliance Assistant", layout="wide")
 
-MODEL = "llama-3.3-70b-versatile"
+MODEL = "openai/gpt-oss-120b"
 
 LABELS = {
     "rbi_nbfc_credit":   "RBI NBFC – Credit Facilities Directions, 2025",
