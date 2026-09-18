@@ -6,6 +6,9 @@ from groq import Groq
 st.set_page_config(page_title="IIFL Gold Loan Compliance Assistant", layout="wide")
 
 MODEL = "openai/gpt-oss-120b"
+MODEL_NAME = "GPT-OSS 120B"
+# Model the Evidence-tab results were measured on. Change this if you re-run the tests.
+EVAL_MODEL = "Llama 3.3 70B"
 
 LABELS = {
     "rbi_nbfc_credit":   "RBI NBFC – Credit Facilities Directions, 2025",
@@ -32,6 +35,7 @@ HINDI_MAP = {
 }
 
 def label(src):
+    src = src.strip()  # some corpus entries have a leading space, e.g. " iifl_annual"
     return LABELS.get(src, src)
 
 @st.cache_data
@@ -51,14 +55,16 @@ def get_client():
     return Groq(api_key=st.secrets["GROQ_API_KEY"])
 
 def retrieve(query, k=5):
-    """BM25 retrieval. Devanagari terms mapped to English for search only.
+    """BM25 retrieval. Devanagari terms are mapped to English for search only,
+    including Hindi words inside a mostly-English (Hinglish) question.
     No extra API call — the map is local and deterministic."""
     toks = re.findall(r"[a-z0-9]+", query.lower())
-    mapped = None
-    if len(toks) < 2:
-        mapped = " ".join(HINDI_MAP.get(w.strip("?।,."), "") for w in query.split())
-        mapped = re.sub(r"\s+", " ", mapped).strip()
-        toks = re.findall(r"[a-z0-9]+", mapped.lower())
+    hindi_words = [w.strip("?।,.!") for w in query.split()
+                   if re.search(r"[\u0900-\u097F]", w)]
+    mapped_terms = [HINDI_MAP[w] for w in hindi_words if w in HINDI_MAP]
+    mapped = " ".join(mapped_terms) if mapped_terms else None
+    if mapped:
+        toks += re.findall(r"[a-z0-9]+", mapped.lower())
     if not toks:
         return [], mapped
     scores = bm25.get_scores(toks)
@@ -105,6 +111,11 @@ st.title("IIFL Gold Loan Compliance Assistant")
 st.caption(
     f"{data['n_chunks']} passages · {data['n_sources']} sources · "
     f"corpus frozen {data['frozen_on']} · every answer cited or NOT FOUND"
+)
+st.caption(
+    "Independent project built from public documents (rbi.org.in, iifl.com). "
+    "Not affiliated with IIFL Finance or the Reserve Bank of India. "
+    "Not legal or compliance advice."
 )
 
 if "GROQ_API_KEY" not in st.secrets:
@@ -181,7 +192,8 @@ with tab2:
 
 with tab3:
     st.subheader("Measured results")
-    st.caption("47 automated tests, temperature 0, run against this corpus.")
+    st.caption(f"47 test cases, temperature 0, run against this corpus. "
+               f"Measured on {EVAL_MODEL}; the app currently runs {MODEL_NAME}.")
 
     e1, e2, e3, e4 = st.columns(4)
     e1.metric("Accuracy", "14/15")
@@ -230,7 +242,7 @@ with tab4:
 | Layer | Choice | Cost | Why |
 |---|---|---|---|
 | Retrieval | BM25 (rank_bm25) | Rs 0 | Regulatory queries are terminology-exact. Dense embeddings need PyTorch, which exceeds the free deployment memory ceiling. |
-| Generation | Groq, Llama 3.3 70B | Rs 0 | Sub-second inference. Temperature 0 for reproducibility. |
+| Generation | Groq, GPT-OSS 120B | Rs 0 | Fast hosted inference. Temperature 0 for reproducibility. |
 | Multilingual | Local term map | Rs 0 | Hindi handled without a second API call. |
 | Interface | Streamlit | Rs 0 | |
 | Hosting | Streamlit Community Cloud | Rs 0 | |
