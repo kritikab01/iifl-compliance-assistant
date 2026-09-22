@@ -30,7 +30,7 @@ A branch officer at a gold-loan NBFC gets questions like *"What's the maximum lo
 | **Stack** | Every technical choice, its cost, and why it was chosen. |
 
 ---
-
+![Case check screenshot](docs/screenshot-case-check.png)
 ## How it works
 
 ```mermaid
