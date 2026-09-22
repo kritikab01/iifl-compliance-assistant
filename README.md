@@ -2,7 +2,7 @@
 
 **An AI assistant that answers gold-loan compliance questions from RBI regulations and IIFL documents in seconds, citing the exact source or saying "NOT FOUND" instead of guessing.**
 
-🔗 **[Live App](PASTE-YOUR-STREAMLIT-LINK-HERE)** · Works in English, Hindi and Hinglish
+🔗 **[Live App](https://iifl-compliance-assistant-tud4a8bepzteqxkccpbc9b.streamlit.app/)** · Works in English, Hindi and Hinglish
 
 ![App screenshot](docs/screenshot-ask.png)
 
@@ -58,7 +58,7 @@ The model is instructed to answer **only** from the retrieved passages, cite eve
 | Language | **4 / 4** (up from 3 / 4) | English, Hinglish, Hindi and broken English |
 | Latency | **0.9 s median** | 6.7 s under sustained load |
 
-*Measured on [MODEL NAME USED FOR THE TESTS].*
+*Measured on Llama 3.3 70B; the app currently runs GPT-OSS 120B.*
 
 ### What failed, and what I changed
 
@@ -84,9 +84,8 @@ The model is instructed to answer **only** from the retrieved passages, cite eve
 
 1. **Scale:** the free tier caps usage at about 47 queries a day. A pilot across many branches would need a paid tier or on-premise hosting.
 2. **Loan purpose in Case check:** the checker applies the tiered LTV caps for consumption loans; it should ask for the loan purpose first.
-3. **Mixed-script questions:** Hindi words inside a mostly-English question aren't mapped yet.
-4. **Automatic corpus updates:** detect new RBI circulars and re-index without manual steps.
-5. **Feedback button:** let branch staff flag wrong answers, to build a real evaluation set from actual use.
+3. **Automatic corpus updates:** detect new RBI circulars and re-index without manual steps.
+4. **Feedback button:** let branch staff flag wrong answers, to build a real evaluation set from actual use.
 
 ---
 
@@ -127,12 +126,13 @@ app.py                              # retrieval, prompting and the Streamlit int
 corpus.json                         # 702 pre-processed passages with source and page
 requirements.txt
 .streamlit/secrets.toml.example     # template for the API key
+docs/screenshot-ask.png             # screenshot of the Ask tab
 ```
 
 ---
 
 ## My role
 
-[Individual project / Group project for COURSE NAME at FORE School of Management. If group: list members and what you personally did.]
+Individual project for the **AI for Managers: Application and Strategy** course at FORE School of Management. I designed and built the full system — corpus collection from RBI and IIFL, the BM25 retrieval pipeline, prompt rules, the Hindi term map, the 47 evaluation tests, and the Streamlit interface.
 
-**Kritika Bhachawat** · [LinkedIn](https://www.linkedin.com/in/kritika-bhachawat-jain-4740ba194/) · [Portfolio](https://kritikabhachawat.me)
+**Kritika Bhachawat** · [LinkedIn](https://www.linkedin.com/in/kritika-bhachawat-jain-4740ba194/) · [Portfolio](https://kritikabhachawat.me/)
